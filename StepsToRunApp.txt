@@ -1,0 +1,12 @@
+Note: dataset could'nt be uploaded due to large size
+Follow this step to run the app
+
+a. download or git clone this app and create a folder where ever you want in your computer.
+b. open anaconda prompt.
+c. change directory to the folder created in step a.
+d. move the dataset in the folder
+e. now write the code below to intall streamlit
+    pip install streamlit
+f. after installation of streamlit run the app.py file using following code below
+    streamlit run app.py
+    
