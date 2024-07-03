@@ -9,10 +9,16 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, roc_auc_score
 
-# Cache the loading of the dataset to improve performance
+# Function to load the dataset from an uploaded file
 @st.cache_data
-def load_data():
-    df = pd.read_csv('onlinefraud.csv')
+def load_uploaded_data(uploaded_file):
+    # Determine the file type and read accordingly
+    if uploaded_file.name.endswith('.csv'):
+        df = pd.read_csv(uploaded_file)
+    else:
+        df = pd.read_excel(uploaded_file)
+    
+    # Drop missing values and map the 'isFraud' column
     df.dropna(inplace=True)
     df['isFraud'] = df['isFraud'].map({0: 'No Fraud', 1: 'Fraud'})
     return df
@@ -39,14 +45,22 @@ def train_model(df):
     
     return clf, X_train, X_test, y_train, y_test
 
-# Load and preprocess the data
-df = load_data()
+# Streamlit App
+st.title("Fraud Detection App")
+
+# Sidebar: File uploader for CSV and Excel files
+st.sidebar.header("Upload CSV or Excel File")
+uploaded_file = st.sidebar.file_uploader("Choose a CSV or Excel file", type=['csv', 'xlsx', 'xls'])
+
+# Load and preprocess the uploaded data
+if uploaded_file:
+    df = load_uploaded_data(uploaded_file)
+else:
+    st.warning("Please upload a CSV or Excel file to proceed.")
+    st.stop()
 
 # Train and cache the model
 clf, X_train, X_test, y_train, y_test = train_model(df)
-
-# Streamlit App
-st.title("Fraud Detection App")
 
 st.sidebar.header("User Input Features")
 
@@ -112,6 +126,7 @@ fig, ax = plt.subplots()
 sns.boxplot(x='type', y='amount', data=df)
 st.pyplot(fig)
 
+# Add the new countplot with bar labels
 st.subheader('Count Plot of Transaction Type with Bar Labels')
 fig, ax = plt.subplots()
 ax = sns.countplot(x='type', data=df, palette='PuBu')
