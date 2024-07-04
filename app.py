@@ -95,7 +95,6 @@ st.subheader('User Input:')
 st.write(user_input)
 
 # Preprocess the user input
-# Ensure that the input to the model is a DataFrame
 preprocessed_input = clf.named_steps['preprocessor'].transform(user_input)
 
 # Prediction using the Random Forest model
@@ -107,26 +106,26 @@ st.subheader('Prediction:')
 st.write('Prediction:', 'Fraud' if prediction[0] else 'No Fraud')
 st.write('Prediction Probability:', prediction_prob)
 
-# Display model performance metrics only when requested
+# Displaying model performance metrics only when requested
 if st.checkbox('Show model performance metrics'):
     st.subheader('Classification Report:')
     y_pred = clf.predict(X_test)
     st.text(classification_report(y_test, y_pred))
     st.write('ROC-AUC Score:', roc_auc_score(y_test, clf.predict_proba(X_test)[:, 1]))
 
-# Visualize the distribution of the target variable
+# Visualization of the distribution of the target variable
 st.subheader('Fraud Distribution in Dataset')
 fig, ax = plt.subplots()
 sns.countplot(x='isFraud', data=df)
 st.pyplot(fig)
 
-# Visualize the distribution of the amount for different transaction types
+# Visualization of the distribution of the amount for different transaction types
 st.subheader('Transaction Amount Distribution by Type')
 fig, ax = plt.subplots()
 sns.boxplot(x='type', y='amount', data=df)
 st.pyplot(fig)
 
-# Add the new countplot with bar labels
+# countplot with bar labels
 st.subheader('Count Plot of Transaction Type with Bar Labels')
 fig, ax = plt.subplots()
 ax = sns.countplot(x='type', data=df, palette='PuBu')
@@ -135,4 +134,14 @@ for container in ax.containers:
 plt.title('Count plot of transaction type')
 plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.ylabel('Number of transactions')
+st.pyplot(fig)
+
+# heatmap to show the correlation
+st.subheader('Correlation Heatmap')
+fig, ax = plt.subplots(figsize=(10, 8))
+df_numeric = df.copy()
+df_numeric['isFraud'] = df_numeric['isFraud'].map({'No Fraud': 0, 'Fraud': 1})
+corr = df_numeric.corr()
+sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax)
+plt.title('Heatmap of Feature Correlations')
 st.pyplot(fig)
